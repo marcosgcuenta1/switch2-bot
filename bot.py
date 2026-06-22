@@ -156,6 +156,14 @@ def run_once(cfg: dict, token: str, chat_id: str, debug: bool = False) -> None:
     query = cfg["search_query"]
     active = [s for s, on in cfg.get("sites", {}).items() if on and s in SITES]
 
+    # En GitHub Actions las tiendas (Amazon/MediaMarkt/AliExpress) bloquean la IP
+    # del runner, asi que alli limitamos a Chollometro con ONLY_SITES=chollometro.
+    # En local no se define y corren todas las de config.yaml.
+    only = os.getenv("ONLY_SITES")
+    if only:
+        wanted = {x.strip() for x in only.split(",") if x.strip()}
+        active = [s for s in active if s in wanted]
+
     all_products: list[Product] = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)

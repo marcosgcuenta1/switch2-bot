@@ -75,7 +75,18 @@ que retocar `scrapers.py`. Si una web da 0 productos, lanza `--debug` y mira el
 Alternativa más estable (de pago) para Amazon: la API de **Keepa**.
 
 ## Dejarlo corriendo siempre
-- **Sencillo:** deja `python bot.py` abierto en una terminal.
-- **Tarea programada de Windows:** programa `python bot.py --once` cada 30 min.
-- **GitHub Actions:** como el bot del Mundial, un workflow `cron` que ejecute
-  `--once` (requiere `playwright install` en el runner).
+
+### GitHub Actions (24/7, ya configurado)
+El workflow `.github/workflows/cazaofertas.yml` corre cada 30 min en la nube.
+**Solo vigila Chollometro** (`ONLY_SITES=chollometro`): las tiendas (Amazon,
+MediaMarkt, AliExpress) bloquean la IP de datacenter de los runners, así que
+desde Actions devuelven 0. Chollometro es un agregador, así que una bajada real
+de la consola suele aparecer ahí igualmente. El estado se versiona en `state.json`
+(el workflow lo commitea de vuelta) para no repetir avisos.
+
+Secrets necesarios en el repo: `TELEGRAM_TOKEN` y `TELEGRAM_CHAT_ID`.
+
+### Local (las 4 webs)
+Tu IP de casa NO está bloqueada, así que en local funcionan las 4. Opciones:
+- Deja `python bot.py` abierto en una terminal, o
+- **Tarea Programada de Windows:** lanza `bot.py --once` cada 30 min al encender.

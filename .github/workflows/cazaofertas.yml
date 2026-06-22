@@ -46,6 +46,8 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Las tiendas bloquean la IP de los runners; aqui solo Chollometro.
+          ONLY_SITES: chollometro
         run: python bot.py --once
 
       - name: Guardar estado (state.json)
