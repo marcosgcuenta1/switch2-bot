@@ -17,7 +17,10 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    # 22.04 a proposito: Playwright 1.44 (fijado por el Python 3.9 local) no
+    # conoce el paquete renombrado libasound2t64 de Ubuntu 24.04, asi que
+    # "playwright install --with-deps" falla en ubuntu-latest.
+    runs-on: ubuntu-22.04
     steps:
       - name: Descargar repo
         uses: actions/checkout@v4
