@@ -1,0 +1,8 @@
+# Versiones fijadas porque solo hay Python 3.9 sin compilador C++:
+# playwright 1.44 + greenlet 3.0.3 traen wheel precompilado para cp39 win_amd64.
+playwright==1.44.0
+greenlet==3.0.3
+beautifulsoup4>=4.12
+requests>=2.31
+PyYAML>=6.0
+python-dotenv>=1.0

@@ -1,0 +1,39 @@
+# --- Configuracion del bot cazaofertas Nintendo Switch 2 ---
+
+# Termino de busqueda que se lanza en cada web
+search_query: "nintendo switch 2"
+
+# Cada cuanto revisa (en minutos)
+poll_interval_minutes: 30
+
+# --- Que se considera "oferta" ---
+# Avisa si el precio es <= target_price...
+target_price: 430
+# ...O si baja al menos este % respecto al minimo historico visto por el bot.
+drop_percent: 8
+
+# Suelo de precio: ignora cualquier resultado por debajo de esto. La consola
+# Switch 2 ronda los 430-600 EUR, asi que esto descarta juegos y accesorios
+# (que tambien contienen "switch 2" en el titulo) de un plumazo.
+ignore_below_price: 350
+
+# Filtro de titulo: el producto debe contener TODAS estas cadenas (en minusculas).
+# Usamos la frase "switch 2" entera para no confundir con la Switch 1 ni casar
+# el "2" dentro de "32gb" y similares.
+title_must_contain:
+  - "switch 2"
+
+# Palabras que descartan el resultado (fundas, protectores, etc.). Opcional.
+title_must_not_contain:
+  - "funda"
+  - "carcasa"
+  - "protector"
+  - "cargador"
+  - "mando"
+
+# Webs activas
+sites:
+  amazon: true
+  mediamarkt: true
+  aliexpress: true
+  chollometro: true

@@ -1,0 +1,8 @@
+.env
+# state.json SI se versiona: en GitHub Actions es como persiste el estado
+# entre ejecuciones (el bot lo commitea de vuelta). En local no pasa nada.
+__pycache__/
+*.pyc
+.venv/
+venv/
+debug_*.html
