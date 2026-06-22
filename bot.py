@@ -108,12 +108,20 @@ def is_offer(p: Product, state: dict, cfg: dict, deal_site: bool = False) -> tup
     key = p.key()
     entry = state.get(key, {})
 
-    # Webs tipo agregador (Chollometro): cada chollo NUEVO que pase el filtro
-    # es de por si una oferta. Solo avisamos la primera vez que lo vemos.
+    # Webs tipo agregador (Chollometro): avisamos de un chollo NUEVO de consola
+    # solo si ademas esta por debajo del techo (target_price). Marcamos "notified"
+    # para no repetir, pero si lo vimos caro y luego baja de 400, si avisamos.
     if deal_site:
-        first_time = key not in state
-        state[key] = {"title": p.title, "last_price": p.price, "seen": True}
-        return first_time, "chollo nuevo en Chollometro"
+        target = cfg.get("target_price")
+        within = target is None or p.price <= target
+        already = entry.get("notified", False)
+        notify = within and not already
+        state[key] = {
+            "title": p.title,
+            "last_price": p.price,
+            "notified": already or notify,
+        }
+        return notify, f"chollo de consola por debajo de {target}€"
 
     historic_min = entry.get("min_price")
     last_notified = entry.get("last_notified")
@@ -151,7 +159,8 @@ def is_offer(p: Product, state: dict, cfg: dict, deal_site: bool = False) -> tup
 # Pasada principal
 # --------------------------------------------------------------------------- #
 
-def run_once(cfg: dict, token: str, chat_id: str, debug: bool = False) -> None:
+def run_once(cfg: dict, token: str, chat_id: str, debug: bool = False,
+             test_mode: bool = False) -> None:
     state = load_state()
     query = cfg["search_query"]
     active = [s for s, on in cfg.get("sites", {}).items() if on and s in SITES]
@@ -178,16 +187,40 @@ def run_once(cfg: dict, token: str, chat_id: str, debug: bool = False) -> None:
             all_products.extend(products)
         browser.close()
 
+    emojis = {"amazon": "🟠", "mediamarkt": "🔴", "aliexpress": "🟡", "chollometro": "🔥"}
     offers_found = 0
+    per_site: dict[str, int] = {}   # solo para el modo prueba
+
+    if test_mode:
+        send_telegram(token, chat_id,
+                      "🧪 <b>Prueba del bot Switch 2</b>\nEsto es lo que encuentro "
+                      "ahora mismo (NO son ofertas reales, solo te enseño que funciona "
+                      "y qué ve el bot). Máximo 2 por web.")
+
     for p in all_products:
         if not matches_filter(p, cfg):
             continue
+        emoji = emojis.get(p.site, "🛒")
+
+        if test_mode:
+            # Manda hasta 2 por web sin tocar el estado, solo para enseñar
+            if per_site.get(p.site, 0) >= 2:
+                continue
+            per_site[p.site] = per_site.get(p.site, 0) + 1
+            offers_found += 1
+            msg = (
+                f"{emoji} <b>[PRUEBA] {p.site}</b>\n\n"
+                f"<b>{p.title}</b>\n"
+                f"💶 <b>{p.price:.2f}€</b>\n\n"
+                f'<a href="{p.url}">Ver en la web</a>'
+            )
+            send_telegram(token, chat_id, msg)
+            continue
+
         deal_site = SITES.get(p.site, {}).get("deal_site", False)
         offer, reason = is_offer(p, state, cfg, deal_site=deal_site)
         if offer:
             offers_found += 1
-            emoji = {"amazon": "🟠", "mediamarkt": "🔴",
-                     "aliexpress": "🟡", "chollometro": "🔥"}.get(p.site, "🛒")
             msg = (
                 f"{emoji} <b>¡OFERTA Switch 2!</b> ({p.site})\n\n"
                 f"<b>{p.title}</b>\n"
@@ -198,15 +231,20 @@ def run_once(cfg: dict, token: str, chat_id: str, debug: bool = False) -> None:
             log.info("OFERTA: %s | %.2f€ | %s", p.site, p.price, p.title[:60])
             send_telegram(token, chat_id, msg)
 
-    save_state(state)
-    log.info("Pasada terminada: %d productos, %d ofertas nuevas.",
-             len(all_products), offers_found)
+    if not test_mode:
+        save_state(state)
+    label = "enviados (prueba)" if test_mode else "ofertas nuevas"
+    log.info("Pasada terminada: %d productos, %d %s.",
+             len(all_products), offers_found, label)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Bot cazaofertas Nintendo Switch 2")
     parser.add_argument("--once", action="store_true", help="una sola pasada y salir")
     parser.add_argument("--debug", action="store_true", help="guarda el HTML de cada web")
+    parser.add_argument("--test", action="store_true",
+                        help="envia por Telegram lo que encuentra ahora (max 2/web), "
+                             "sin tocar el estado; para comprobar que funciona")
     args = parser.parse_args()
 
     load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -221,6 +259,10 @@ def main() -> None:
         cfg = yaml.safe_load(f)
 
     interval = cfg.get("poll_interval_minutes", 30) * 60
+
+    if args.test:
+        run_once(cfg, token, chat_id, debug=args.debug, test_mode=True)
+        return
 
     if args.once:
         run_once(cfg, token, chat_id, debug=args.debug)

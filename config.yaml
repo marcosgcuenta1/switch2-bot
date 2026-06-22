@@ -7,10 +7,11 @@ search_query: "nintendo switch 2"
 poll_interval_minutes: 30
 
 # --- Que se considera "oferta" ---
-# Avisa si el precio es <= target_price...
-target_price: 430
-# ...O si baja al menos este % respecto al minimo historico visto por el bot.
-drop_percent: 8
+# UNICA condicion: avisa solo si la consola baja de este precio.
+target_price: 400
+# Aviso por caida porcentual DESACTIVADO (null): solo queremos avisos < 400 EUR.
+# Si algun dia quieres reactivarlo, pon un numero (p.ej. 8).
+drop_percent: null
 
 # Suelo de precio: ignora cualquier resultado por debajo de esto. La consola
 # Switch 2 ronda los 430-600 EUR, asi que esto descarta juegos y accesorios

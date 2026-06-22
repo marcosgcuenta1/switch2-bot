@@ -4,12 +4,9 @@ Revisa **Amazon**, **MediaMarkt**, **AliExpress** y **Chollometro** cada X minut
 buscando la Nintendo Switch 2 y te avisa por **Telegram** cuando detecta una oferta.
 
 ## Qué considera "oferta"
-En las tiendas (Amazon, MediaMarkt, AliExpress) avisa cuando el precio:
-- es **≤ `target_price`** (umbral que tú pones), **o**
-- ha **bajado ≥ `drop_percent` %** respecto al mínimo histórico que el bot va guardando.
-
-En **Chollometro** (agregador de chollos) avisa de **cada chollo nuevo** de la
-consola que aparezca, sin esperar a un umbral.
+Regla única: avisa solo si una Switch 2 está **por debajo de `target_price`**
+(ahora 400 €). Aplica a todas las webs, incluida Chollometro. El aviso por caída
+porcentual (`drop_percent`) está desactivado (`null`).
 
 Para no avisarte de juegos ni accesorios (que también llevan "Switch 2" en el
 título), descarta todo lo que cueste menos de `ignore_below_price` (la consola
@@ -61,6 +58,10 @@ python bot.py --once --debug
 
 # Bucle continuo (revisa cada poll_interval_minutes)
 python bot.py
+
+# PRUEBA: envia por Telegram lo que encuentra ahora (max 2/web), sin tocar
+# el estado y marcado como [PRUEBA]. Para comprobar que el envio funciona.
+python bot.py --test
 ```
 
 ---
