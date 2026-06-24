@@ -130,5 +130,10 @@
     "min_price": 439.5,
     "last_price": 439.5,
     "last_notified": null
+  },
+  "https://www.chollometro.com/ofertas/nintendo-switch-2-1926853": {
+    "title": "Nintendo Switch 2",
+    "last_price": 449.0,
+    "notified": false
   }
 }
