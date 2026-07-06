@@ -12,6 +12,20 @@ Para no avisarte de juegos ni accesorios (que también llevan "Switch 2" en el
 título), descarta todo lo que cueste menos de `ignore_below_price` (la consola
 ronda los 430–600 €). Con deduplicación: no repite el mismo aviso salvo bajada mayor.
 
+## Filtro de IA y cupones (opcional, gratis)
+Si defines `GEMINI_API_KEY` (gratis en https://aistudio.google.com/apikey), antes
+de avisar el bot pasa los candidatos por **Gemini Flash**, que:
+- **Descarta lo que no es consola** (fundas, mandos, juegos sueltos, packs raros)
+  mejor que el filtro de keywords.
+- **Tiene en cuenta los cupones** (sobre todo de AliExpress): calcula un *precio
+  efectivo* tras el descuento y decide la oferta con él, así no se pierden chollos
+  cuyo precio de lista supera el umbral pero con cupón baja. Ignora los "Ahorra X€"
+  inflados de AliExpress y marca los cupones de "nuevo comprador" como tales.
+- Añade una puntuación `IA 0-100` de lo buena que es la oferta.
+
+Sin la clave, el bot funciona igual que siempre (solo keywords y precio de lista).
+En GitHub Actions, añade el secret `GEMINI_API_KEY` para activarlo también ahí.
+
 > **Nota de realismo:** Amazon es la fuente más fiable. MediaMarkt va con
 > selectores a medida. AliExpress funciona pero está lleno de clones e
 > importaciones grises. Si una web deja de dar resultados, lanza

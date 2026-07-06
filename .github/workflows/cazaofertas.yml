@@ -46,8 +46,13 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # Las tiendas bloquean la IP de los runners; aqui solo Chollometro.
-          ONLY_SITES: chollometro
+          # (Opcional) Si anades el secret GEMINI_API_KEY, la IA filtra los
+          # chollos de Chollometro que no son consola. Sin el, sigue con keywords.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Las tiendas (Amazon/MediaMarkt/AliExpress) bloquean la IP de los
+          # runners. Probamos Chollometro + Wallapop; si Wallapop tambien
+          # bloquea, quitarlo de aqui.
+          ONLY_SITES: chollometro,wallapop
         run: python bot.py --once
 
       - name: Guardar estado (state.json)

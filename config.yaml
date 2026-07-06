@@ -18,6 +18,13 @@ drop_percent: null
 # (que tambien contienen "switch 2" en el titulo) de un plumazo.
 ignore_below_price: 350
 
+# Suelo propio por web. En segunda mano (Wallapop/Milanuncios) una consola usada
+# puede costar 300-380 EUR legitimamente, asi que bajamos el suelo a 250 para no
+# perderlas (por debajo de 250 casi siempre es accesorio, caja vacia o estafa).
+ignore_below_price_by_site:
+  wallapop: 250
+  milanuncios: 250
+
 # Filtro de titulo: el producto debe contener TODAS estas cadenas (en minusculas).
 # Usamos la frase "switch 2" entera para no confundir con la Switch 1 ni casar
 # el "2" dentro de "32gb" y similares.
@@ -38,3 +45,41 @@ sites:
   mediamarkt: true
   aliexpress: true
   chollometro: true
+  wallapop: true       # segunda mano (solo funciona en local; la nube la bloquea)
+  milanuncios: true    # segunda mano; DataDome la bloquea a menudo (best-effort)
+
+# --- Capa de IA (opcional) ---
+# Si defines GEMINI_API_KEY en el entorno, la IA descarta lo que NO es una
+# consola Switch 2 de verdad (accesorios, fundas, juegos, reservas, packs raros
+# que el filtro de keywords deja pasar) y anota una puntuacion de oferta 0-100.
+# Sin la clave, el bot funciona igual que antes (solo keywords). Es 100% gratis:
+# Gemini Flash da 1500 peticiones/dia en su tier libre.
+ai:
+  enabled: true            # ponlo en false para apagar la IA aunque haya clave
+  model: ""                # "" = empezar por el primero de la cadena de fallback
+  batch_size: 5            # productos por llamada (no lo subas mucho: tier gratis)
+  rate_limit_seconds: 7    # segundos minimos entre llamadas a la API
+
+# --- Codigos de cupon de plataforma ---
+# Codigos que se TECLEAN en el pago y NO estan en el precio mostrado (a diferencia
+# de los descuentos automaticos de AliExpress, que ya van incluidos). El bot aplica
+# el mejor codigo aplicable (segun compra minima) al precio efectivo y lo marca.
+# Caducan: ACTUALIZALOS a mano cuando salgan nuevos (los viejos se ignoran solos
+# al pasar su fecha 'caduca'). Fuentes: chollometro.com/cupones, cupones.es, etc.
+codigos_plataforma:
+  aliexpress:
+    - codigo: "BDES40"
+      descuento: 40         # € de descuento
+      mineur: 329           # compra minima en €
+      caduca: "2026-06-26"
+      nota: "Dia de marcas, solo envios a Espana"
+    - codigo: "BDES25"
+      descuento: 25
+      mineur: 209
+      caduca: "2026-06-26"
+      nota: "Dia de marcas"
+    - codigo: "BDES12"
+      descuento: 12
+      mineur: 109
+      caduca: "2026-06-26"
+      nota: "Dia de marcas"
