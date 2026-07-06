@@ -49,10 +49,10 @@ jobs:
           # (Opcional) Si anades el secret GEMINI_API_KEY, la IA filtra los
           # chollos de Chollometro que no son consola. Sin el, sigue con keywords.
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          # Las tiendas (Amazon/MediaMarkt/AliExpress) bloquean la IP de los
-          # runners. Probamos Chollometro + Wallapop; si Wallapop tambien
-          # bloquea, quitarlo de aqui.
-          ONLY_SITES: chollometro,wallapop
+          # Las tiendas (Amazon/MediaMarkt/AliExpress) y tambien Wallapop
+          # bloquean la IP de los runners (probado 2026-07-06: wallapop devuelve
+          # 0 desde aqui). En la nube solo funciona Chollometro.
+          ONLY_SITES: chollometro
         run: python bot.py --once
 
       - name: Guardar estado (state.json)
